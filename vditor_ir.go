@@ -31,6 +31,9 @@ func (lute *Lute) SpinVditorIRDOM(ivHTML string) (ovHTML string) {
 	markdown := lute.vditorIRDOM2Md(ivHTML)
 	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
 	renderer := render.NewVditorIRRenderer(tree, lute.RenderOptions)
+	for nodeType, rendererFunc := range lute.SpinVditorIRDOMRendererFuncs {
+		renderer.ExtRendererFuncs[nodeType] = rendererFunc
+	}
 	output := renderer.Render()
 	// 替换插入符
 	ovHTML = strings.ReplaceAll(string(output), editor.Caret, "<wbr>")

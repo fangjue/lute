@@ -32,6 +32,9 @@ type Lute struct {
 	ParseOptions  *parse.Options  // 解析选项
 	RenderOptions *render.Options // 渲染选项
 
+	SpinVditorDOMRendererFuncs    map[ast.NodeType]render.ExtRendererFunc // 用户自定义的 自旋 Vditor DOM 渲染器函数，用于所见即所得模式下的编辑。
+	SpinVditorIRDOMRendererFuncs  map[ast.NodeType]render.ExtRendererFunc // 用户自定义的 自旋 Vditor Instant-Rendering DOM 渲染器函数，用于即时渲染模式下的编辑。
+	SpinVditorSVDOMRendererFuncs  map[ast.NodeType]render.ExtRendererFunc // 用户自定义的 自旋 Vditor Split-View DOM 渲染器函数，用于分屏预览模式下的编辑。
 	HTML2MdRendererFuncs          map[ast.NodeType]render.ExtRendererFunc // 用户自定义的 HTML2Md 渲染器函数
 	HTML2VditorDOMRendererFuncs   map[ast.NodeType]render.ExtRendererFunc // 用户自定义的 HTML2VditorDOM 渲染器函数
 	HTML2VditorIRDOMRendererFuncs map[ast.NodeType]render.ExtRendererFunc // 用户自定义的 HTML2VditorIRDOM 渲染器函数
@@ -65,6 +68,9 @@ func New(opts ...ParseOption) (ret *Lute) {
 		opt(ret)
 	}
 
+	ret.SpinVditorDOMRendererFuncs = map[ast.NodeType]render.ExtRendererFunc{}
+	ret.SpinVditorIRDOMRendererFuncs = map[ast.NodeType]render.ExtRendererFunc{}
+	ret.SpinVditorSVDOMRendererFuncs = map[ast.NodeType]render.ExtRendererFunc{}
 	ret.HTML2MdRendererFuncs = map[ast.NodeType]render.ExtRendererFunc{}
 	ret.HTML2VditorDOMRendererFuncs = map[ast.NodeType]render.ExtRendererFunc{}
 	ret.HTML2VditorIRDOMRendererFuncs = map[ast.NodeType]render.ExtRendererFunc{}
@@ -568,7 +574,13 @@ func (lute *Lute) SetJSRenderers(options map[string]map[string]*js.Object) {
 		}
 
 		var rendererFuncs map[ast.NodeType]render.ExtRendererFunc
-		if "HTML2Md" == rendererType {
+		if "SpinVditorDOM" == rendererType {
+			rendererFuncs = lute.SpinVditorDOMRendererFuncs
+		} else if "SpinVditorIRDOM" == rendererType {
+			rendererFuncs = lute.SpinVditorIRDOMRendererFuncs
+		} else if "SpinVditorSVDOM" == rendererType {
+			rendererFuncs = lute.SpinVditorSVDOMRendererFuncs
+		} else if "HTML2Md" == rendererType {
 			rendererFuncs = lute.HTML2MdRendererFuncs
 		} else if "HTML2VditorDOM" == rendererType {
 			rendererFuncs = lute.HTML2VditorDOMRendererFuncs

@@ -28,6 +28,9 @@ func (lute *Lute) SpinVditorSVDOM(markdown string) (ovHTML string) {
 	tree := parse.Parse("", []byte(markdown), lute.ParseOptions)
 
 	renderer := render.NewVditorSVRenderer(tree, lute.RenderOptions)
+	for nodeType, rendererFunc := range lute.SpinVditorSVDOMRendererFuncs {
+		renderer.ExtRendererFuncs[nodeType] = rendererFunc
+	}
 	output := renderer.Render()
 	// 替换插入符
 	ovHTML = strings.ReplaceAll(string(output), editor.Caret, "<wbr>")
